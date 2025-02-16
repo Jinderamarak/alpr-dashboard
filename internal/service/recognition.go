@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
 	"github.com/jinderamarak/alpr-dasboard/internal/repository"
+	"github.com/jinderamarak/alpr-dasboard/internal/util"
 )
 
 const RecognitionPageSize = 10
@@ -55,8 +56,7 @@ func (service *recognitionService) CountPages() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	return int(max(count/RecognitionPageSize, 1)), nil
+	return util.NumberOfPages(count, RecognitionPageSize), nil
 }
 
 func (service *recognitionService) GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error) {
@@ -70,8 +70,7 @@ func (service *recognitionService) CountPagesWithCarId(carId *uuid.UUID) (int, e
 	if err != nil {
 		return 0, err
 	}
-
-	return int(max(count/RecognitionPageSize, 1)), nil
+	return util.NumberOfPages(count, RecognitionPageSize), nil
 }
 
 func (service *recognitionService) GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error) {

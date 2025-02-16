@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
 	"github.com/jinderamarak/alpr-dasboard/internal/repository"
+	"github.com/jinderamarak/alpr-dasboard/internal/util"
 	"strings"
 )
 
@@ -35,8 +36,7 @@ func (service *carService) CountPages() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	return int(max(count/CarPageSize, 1)), nil
+	return util.NumberOfPages(count, CarPageSize), nil
 }
 
 func (service *carService) GetById(carId uuid.UUID) (model.Car, error) {

@@ -17,6 +17,7 @@ func NewRecognitionController(recognitions service.RecognitionService) Recogniti
 
 func (controller *RecognitionController) Route(routes *gin.RouterGroup) {
 	routes.GET("/:id", controller.GetRecognition)
+	routes.POST("/", controller.PostRecognition)
 }
 
 func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
@@ -29,4 +30,15 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 		"recognized": recognition.CreatedAt,
 		"car":        recognition.Car,
 	})
+}
+
+func (controller *RecognitionController) PostRecognition(ctx *gin.Context) {
+	plate := ctx.PostForm("plate")
+	if len(plate) < 3 {
+		ctx.String(http.StatusBadRequest, "Invalid license plate, minimum length is 3.")
+		return
+	}
+
+	_, _ = controller.recognitions.CreateByPlate(plate)
+	ctx.Redirect(http.StatusSeeOther, "/")
 }

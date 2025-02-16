@@ -6,6 +6,14 @@
     <title>uwu</title>
 </head>
 <body>
+<h2>Create new recognition event:</h2>
+<form method="post" action="/recognition">
+    <label>
+        License Plate
+        <input type="text" name="plate" placeholder="1A29876">
+    </label>
+    <button type="submit">Create</button>
+</form>
 <h2>Recent recognitions:</h2>
 <ul>
     {{ range .recognitions }}

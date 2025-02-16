@@ -4,7 +4,7 @@ Dashboard for Automatic License Plate Reader system
 
 ## Features
 
-- [ ] Push recognition events
+- [x] Push recognition events
 - [x] Recognition events - license plate, origin, timestamp
 - [x] Recognized cars - license plate, description, authorization
 

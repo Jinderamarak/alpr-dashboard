@@ -36,7 +36,7 @@ func (repo *recognitionRepository) GetPageWithCarId(carId *uuid.UUID, offset, li
 	})
 
 	var recognitions []model.Recognition
-	result := repo.db.Find(&recognitions).Order("created_at desc").Where("car_id = ?", id).Offset(offset).Limit(limit)
+	result := repo.db.Order("created_at desc").Where("car_id = ?", id).Offset(offset).Limit(limit).Find(&recognitions)
 	return recognitions, result.Error
 }
 
@@ -52,7 +52,7 @@ func (repo *recognitionRepository) CountWithCarId(carId *uuid.UUID) (int64, erro
 
 func (repo *recognitionRepository) GetPageWithCar(offset, limit int) ([]model.Recognition, error) {
 	var recognitions []model.Recognition
-	result := repo.db.Joins("Car").Order("created_at desc").Offset(offset).Limit(limit).Find(&recognitions)
+	result := repo.db.Joins("Car").Order("recognitions.created_at desc").Offset(offset).Limit(limit).Find(&recognitions)
 	return recognitions, result.Error
 }
 

@@ -36,7 +36,7 @@ func (service *carService) CountPages() (int, error) {
 		return 0, err
 	}
 
-	return int(count/CarPageSize + 1), nil
+	return int(max(count/CarPageSize, 1)), nil
 }
 
 func (service *carService) GetById(carId uuid.UUID) (model.Car, error) {

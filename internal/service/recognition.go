@@ -14,7 +14,7 @@ type RecognitionService interface {
 	CountPages() (int, error)
 	GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error)
 	CountPagesWithCarId(carId *uuid.UUID) (int, error)
-	GetById(recognitionId uuid.UUID) (model.Recognition, error)
+	GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error)
 }
 
 type recognitionService struct {
@@ -56,7 +56,7 @@ func (service *recognitionService) CountPages() (int, error) {
 		return 0, err
 	}
 
-	return int(count/RecognitionPageSize + 1), nil
+	return int(max(count/RecognitionPageSize, 1)), nil
 }
 
 func (service *recognitionService) GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error) {
@@ -71,9 +71,9 @@ func (service *recognitionService) CountPagesWithCarId(carId *uuid.UUID) (int, e
 		return 0, err
 	}
 
-	return int(count/RecognitionPageSize + 1), nil
+	return int(max(count/RecognitionPageSize, 1)), nil
 }
 
-func (service *recognitionService) GetById(recognitionId uuid.UUID) (model.Recognition, error) {
+func (service *recognitionService) GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error) {
 	return service.recognitions.GetByIdWithCar(recognitionId)
 }

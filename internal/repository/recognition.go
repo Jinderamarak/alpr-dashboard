@@ -9,9 +9,9 @@ import (
 
 type RecognitionRepository interface {
 	GetByIdWithCar(id uuid.UUID) (model.Recognition, error)
-	GetPageByCarId(carId *uuid.UUID, offset, limit int) ([]model.Recognition, error)
+	GetPageWithCarId(carId *uuid.UUID, offset, limit int) ([]model.Recognition, error)
 	CountWithCarId(carId *uuid.UUID) (int64, error)
-	GetPage(offset, limit int) ([]model.Recognition, error)
+	GetPageWithCar(offset, limit int) ([]model.Recognition, error)
 	Count() (int64, error)
 	Create(recognition model.Recognition) (model.Recognition, error)
 }
@@ -30,7 +30,7 @@ func (repo *recognitionRepository) GetByIdWithCar(id uuid.UUID) (model.Recogniti
 	return recognition, result.Error
 }
 
-func (repo *recognitionRepository) GetPageByCarId(carId *uuid.UUID, offset, limit int) ([]model.Recognition, error) {
+func (repo *recognitionRepository) GetPageWithCarId(carId *uuid.UUID, offset, limit int) ([]model.Recognition, error) {
 	id := util.MapPtr(carId, func(uuid uuid.UUID) string {
 		return uuid.String()
 	})
@@ -50,9 +50,9 @@ func (repo *recognitionRepository) CountWithCarId(carId *uuid.UUID) (int64, erro
 	return count, result.Error
 }
 
-func (repo *recognitionRepository) GetPage(offset, limit int) ([]model.Recognition, error) {
+func (repo *recognitionRepository) GetPageWithCar(offset, limit int) ([]model.Recognition, error) {
 	var recognitions []model.Recognition
-	result := repo.db.Order("created_at desc").Offset(offset).Limit(limit).Find(&recognitions)
+	result := repo.db.Joins("Car").Order("created_at desc").Offset(offset).Limit(limit).Find(&recognitions)
 	return recognitions, result.Error
 }
 

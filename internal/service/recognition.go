@@ -1,0 +1,79 @@
+package service
+
+import (
+	"github.com/google/uuid"
+	"github.com/jinderamarak/alpr-dasboard/internal/model"
+	"github.com/jinderamarak/alpr-dasboard/internal/repository"
+)
+
+const RecognitionPageSize = 10
+
+type RecognitionService interface {
+	CreateByPlate(plate string) (model.Recognition, error)
+	GetPage(page int) ([]model.Recognition, error)
+	CountPages() (int, error)
+	GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error)
+	CountPagesWithCarId(carId *uuid.UUID) (int, error)
+	GetById(recognitionId uuid.UUID) (model.Recognition, error)
+}
+
+type recognitionService struct {
+	recognitions repository.RecognitionRepository
+	carService   CarService
+}
+
+func NewRecognitionService(recognitions repository.RecognitionRepository, carService CarService) RecognitionService {
+	return &recognitionService{recognitions, carService}
+}
+
+func (service *recognitionService) CreateByPlate(plate string) (model.Recognition, error) {
+	car, err := service.carService.GetOrCreateByPlate(plate)
+	if err != nil {
+		return model.Recognition{}, err
+	}
+
+	recognition := model.Recognition{
+		CarID: &car.ID,
+	}
+
+	created, err := service.recognitions.Create(recognition)
+	if err != nil {
+		return model.Recognition{}, err
+	}
+
+	return created, nil
+}
+
+func (service *recognitionService) GetPage(page int) ([]model.Recognition, error) {
+	offset := (page - 1) * RecognitionPageSize
+	limit := RecognitionPageSize
+	return service.recognitions.GetPageWithCar(offset, limit)
+}
+
+func (service *recognitionService) CountPages() (int, error) {
+	count, err := service.recognitions.Count()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count/RecognitionPageSize + 1), nil
+}
+
+func (service *recognitionService) GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error) {
+	offset := (page - 1) * RecognitionPageSize
+	limit := RecognitionPageSize
+	return service.recognitions.GetPageWithCarId(carId, offset, limit)
+}
+
+func (service *recognitionService) CountPagesWithCarId(carId *uuid.UUID) (int, error) {
+	count, err := service.recognitions.CountWithCarId(carId)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count/RecognitionPageSize + 1), nil
+}
+
+func (service *recognitionService) GetById(recognitionId uuid.UUID) (model.Recognition, error) {
+	return service.recognitions.GetByIdWithCar(recognitionId)
+}

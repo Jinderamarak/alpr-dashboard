@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/google/uuid"
+	"github.com/jinderamarak/alpr-dasboard/internal/data"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
-	"github.com/jinderamarak/alpr-dasboard/internal/repository"
 	"github.com/jinderamarak/alpr-dasboard/internal/util"
 	"strings"
 )
@@ -18,10 +18,10 @@ type CarService interface {
 }
 
 type carService struct {
-	cars repository.CarRepository
+	cars data.CarRepository
 }
 
-func NewCarService(cars repository.CarRepository) CarService {
+func NewCarService(cars data.CarRepository) CarService {
 	return &carService{cars}
 }
 

@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/google/uuid"
+	"github.com/jinderamarak/alpr-dasboard/internal/data"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
-	"github.com/jinderamarak/alpr-dasboard/internal/repository"
 	"github.com/jinderamarak/alpr-dasboard/internal/util"
 )
 
@@ -19,11 +19,11 @@ type RecognitionService interface {
 }
 
 type recognitionService struct {
-	recognitions repository.RecognitionRepository
+	recognitions data.RecognitionRepository
 	carService   CarService
 }
 
-func NewRecognitionService(recognitions repository.RecognitionRepository, carService CarService) RecognitionService {
+func NewRecognitionService(recognitions data.RecognitionRepository, carService CarService) RecognitionService {
 	return &recognitionService{recognitions, carService}
 }
 

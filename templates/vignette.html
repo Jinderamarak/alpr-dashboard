@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Vignette Status</title>
+</head>
+<body>
+<a href="/car/{{ .carId }}">Back to car</a>
+
+{{ if .valid }}
+<h1>Car has valid vignette</h1>
+{{ else }}
+<h1>Car has <b>NO</b> valid vignette</h1>
+{{ end }}
+
+<h2>Charges:</h2>
+<ul>
+    {{ range .charges }}
+    <li>
+        <div>
+            <p>Since: {{ formatDT .ValidSince }}</p>
+            <p>Until: {{ formatDT .ValidUntil }}</p>
+        </div>
+    </li>
+    {{ else }}
+    <li>No charges</li>
+    {{ end }}
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recognition from {{ formatDT .recognized }}</title>
+</head>
+<body>
+<a href="/">Home</a>
+<h1>Recognition from {{ formatDT .recognized }}</h1>
+<h2>
+    Linked Car:
+    {{ if .car }}
+    <a href="/car/{{ .car.ID }}">{{ .car.Plate }}</a>
+    {{ else }}
+    <i>None</i>
+    {{ end }}
+</h2>
+</body>
+</html>

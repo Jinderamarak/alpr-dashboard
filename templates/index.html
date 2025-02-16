@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uwu</title>
+</head>
+<body>
+<h2>Recent recognitions:</h2>
+<ul>
+    {{ range .recognitions }}
+    <li>
+        <p>
+            Car:
+            {{ if .Car }}
+            <a href="/car/{{.Car.ID}}">{{ .Car.Plate }}</a>
+            {{ else }}
+            <i>Not available</i>
+            {{ end }}
+            <a href="/recognition/{{.ID}}">See details</a>
+        </p>
+        <p>Recognized at: {{ formatDT .CreatedAt }}</p>
+    </li>
+    {{ else }}
+    <li>No recent recognitions</li>
+    {{ end }}
+</ul>
+<div style="display: flex;flex-flow: row;justify-content: center;gap: 1rem">
+    {{ range $i := (seq .pages) }}
+    <a href="/?page={{ $i }}">{{ $i }}</a>
+    {{ end }}
+</div>
+</body>
+</html>

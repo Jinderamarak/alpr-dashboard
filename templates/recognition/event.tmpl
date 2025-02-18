@@ -1,0 +1,24 @@
+{{ define "recognition/event" }}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        {{ template "head" }}
+        <title>Recognition Event</title>
+    </head>
+    <body>
+
+    <a href="/">Home</a>
+
+    <h1>Recognition from {{ formatDT .recognized }}</h1>
+    <h2>
+        Linked Car:
+        {{ if .car }}
+            <a href="/car/{{ .car.ID }}">{{ .car.Plate }}</a>
+        {{ else }}
+            <i>None</i>
+        {{ end }}
+    </h2>
+
+    </body>
+    </html>
+{{ end }}

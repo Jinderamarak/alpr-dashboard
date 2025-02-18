@@ -35,7 +35,7 @@ func (controller *CarController) GetCar(ctx *gin.Context) {
 	car, _ := controller.cars.GetById(carUuid)
 	recognitions, _ := controller.recognitions.GetPageWithCarId(&carUuid, page)
 
-	ctx.HTML(http.StatusOK, "car.html", gin.H{
+	ctx.HTML(http.StatusOK, "car/overview", gin.H{
 		"carId":        car.ID,
 		"plate":        car.Plate,
 		"description":  car.Description,
@@ -65,7 +65,7 @@ func (controller *CarController) GetVignette(ctx *gin.Context) {
 		}
 	}
 
-	ctx.HTML(http.StatusOK, "vignette.html", gin.H{
+	ctx.HTML(http.StatusOK, "car/vignette", gin.H{
 		"carId":   car.ID,
 		"valid":   valid,
 		"charges": vignette.Charges,

@@ -26,7 +26,7 @@ func (controller *IndexController) GetIndex(ctx *gin.Context) {
 	pages, _ := controller.recognitions.CountPages()
 	recognitions, _ := controller.recognitions.GetPage(page)
 
-	ctx.HTML(http.StatusOK, "index.html", gin.H{
+	ctx.HTML(http.StatusOK, "index", gin.H{
 		"recognitions": recognitions,
 		"pages":        pages,
 	})

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinderamarak/alpr-dasboard/internal/controller"
 	"github.com/jinderamarak/alpr-dasboard/internal/data"
@@ -10,12 +11,13 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"html/template"
+	"path/filepath"
 )
 
 func main() {
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		errors.Unwrap(err)
 	}
 
 	db.AutoMigrate(&model.Car{}, &model.Recognition{})
@@ -33,15 +35,37 @@ func main() {
 	recognitionController := controller.NewRecognitionController(recognitionService)
 
 	server := gin.Default()
-	server.SetFuncMap(template.FuncMap{
+	server.SetHTMLTemplate(loadTemplates(template.FuncMap{
 		"seq":      templates.Sequence,
 		"formatDT": templates.FormatDateTime,
-	})
-	server.LoadHTMLGlob("templates/*")
+	}))
 
 	indexController.Route(server.Group("/"))
 	carController.Route(server.Group("/car"))
 	recognitionController.Route(server.Group("/recognition"))
 
 	server.Run("localhost:8080")
+}
+
+func loadTemplates(funcMap template.FuncMap) *template.Template {
+	files := make([]string, 0)
+	err := includeSubfolders(&files, "templates/", "*.tmpl")
+	if err != nil {
+		errors.Unwrap(err)
+	}
+
+	return template.Must(template.New("").Funcs(funcMap).ParseFiles(files...))
+}
+
+func includeSubfolders(files *[]string, folder, ending string) error {
+	level, err := filepath.Glob(folder + ending)
+	if err != nil {
+		return err
+	}
+	if len(level) == 0 {
+		return nil
+	}
+
+	*files = append(*files, level...)
+	return includeSubfolders(files, folder+"*/", ending)
 }

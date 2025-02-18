@@ -26,7 +26,7 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 
 	recognition, _ := controller.recognitions.GetByIdWithCar(recognitionUuid)
 
-	ctx.HTML(http.StatusOK, "recognition.html", gin.H{
+	ctx.HTML(http.StatusOK, "recognition/event", gin.H{
 		"recognized": recognition.CreatedAt,
 		"car":        recognition.Car,
 	})

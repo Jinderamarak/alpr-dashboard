@@ -15,6 +15,7 @@ type CarService interface {
 	CountPages() (int, error)
 	GetById(carId uuid.UUID) (model.Car, error)
 	GetOrCreateByPlate(plate string) (model.Car, error)
+	Update(carId uuid.UUID, isAuthorized bool, description string) error
 }
 
 type carService struct {
@@ -46,4 +47,8 @@ func (service *carService) GetById(carId uuid.UUID) (model.Car, error) {
 func (service *carService) GetOrCreateByPlate(plate string) (model.Car, error) {
 	plate = strings.ToUpper(plate)
 	return service.cars.GetOrCreateByPlate(plate)
+}
+
+func (service *carService) Update(carId uuid.UUID, isAuthorized bool, description string) error {
+	return service.cars.Update(carId, isAuthorized, description)
 }

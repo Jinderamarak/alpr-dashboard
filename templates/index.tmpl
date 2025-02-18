@@ -23,11 +23,11 @@
                 <p>
                     Car:
                     {{ if .Car }}
-                        <a href="/car/{{.Car.ID}}">{{ .Car.Plate }}</a>
+                        <a href="/car/{{ .Car.ID }}">{{ .Car.Plate }}</a>
                     {{ else }}
                         <i>Not available</i>
                     {{ end }}
-                    <a href="/recognition/{{.ID}}">See details</a>
+                    <a href="/recognition/{{ .ID }}">See details</a>
                 </p>
                 <p>Recognized at: {{ formatDT .CreatedAt }}</p>
             </li>

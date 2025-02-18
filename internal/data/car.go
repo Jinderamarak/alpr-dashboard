@@ -10,6 +10,7 @@ type CarRepository interface {
 	GetOrCreateByPlate(plate string) (model.Car, error)
 	GetById(id uuid.UUID) (model.Car, error)
 	GetPage(offset, limit int) ([]model.Car, error)
+	Update(id uuid.UUID, isAuthorized bool, description string) error
 	Count() (int64, error)
 }
 
@@ -37,6 +38,14 @@ func (repo *carRepository) GetPage(offset, limit int) ([]model.Car, error) {
 	var cars []model.Car
 	result := repo.db.Order("created_at desc").Offset(offset).Limit(limit).Find(&cars)
 	return cars, result.Error
+}
+
+func (repo *carRepository) Update(id uuid.UUID, isAuthorized bool, description string) error {
+	result := repo.db.Model(&model.Car{}).Where("id = ?", id.String()).Updates(map[string]interface{}{
+		"is_authorized": isAuthorized,
+		"description":   description,
+	})
+	return result.Error
 }
 
 func (repo *carRepository) Count() (int64, error) {

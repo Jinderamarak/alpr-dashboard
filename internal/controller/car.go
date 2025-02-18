@@ -21,6 +21,8 @@ func NewCarController(cars service.CarService, recognitions service.RecognitionS
 
 func (controller *CarController) Route(routes *gin.RouterGroup) {
 	routes.GET("/:id", controller.GetCar)
+	routes.GET("/:id/edit", controller.EditCar)
+	routes.POST("/:id", controller.UpdateCar)
 	routes.GET("/:id/vignette", controller.GetVignette)
 }
 
@@ -43,6 +45,29 @@ func (controller *CarController) GetCar(ctx *gin.Context) {
 		"pages":        pages,
 		"recognitions": recognitions,
 	})
+}
+
+func (controller *CarController) EditCar(ctx *gin.Context) {
+	carId := ctx.Param("id")
+	carUuid, _ := uuid.Parse(carId)
+
+	car, _ := controller.cars.GetById(carUuid)
+
+	ctx.HTML(http.StatusOK, "car/edit", gin.H{
+		"car": car,
+	})
+}
+
+func (controller *CarController) UpdateCar(ctx *gin.Context) {
+	carId := ctx.Param("id")
+	carUuid, _ := uuid.Parse(carId)
+
+	authorized := ctx.PostForm("authorized") == "on"
+	description := ctx.PostForm("description")
+
+	_ = controller.cars.Update(carUuid, authorized, description)
+
+	ctx.Redirect(http.StatusSeeOther, "/car/"+carUuid.String())
 }
 
 func (controller *CarController) GetVignette(ctx *gin.Context) {

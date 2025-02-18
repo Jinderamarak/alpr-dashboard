@@ -1,0 +1,30 @@
+{{ define "car/edit" }}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        {{ template "head" }}
+        <title>Edit Car</title>
+    </head>
+    <body>
+
+    <a href="/car/{{ .car.ID }}">Cancel</a>
+
+    <h1>Car {{ .car.Plate }}</h1>
+
+    <form method="post" action="/car/{{ .car.ID }}">
+        <label>
+            Is Authorized
+            <input type="checkbox" name="authorized" {{ if .car.IsAuthorized }} checked {{ end }}>
+        </label>
+        <br>
+        <label>
+            Description
+            <input type="text" name="description" value="{{ .car.Description }}">
+        </label>
+        <br>
+        <button type="submit">Save</button>
+    </form>
+
+    </body>
+    </html>
+{{ end }}

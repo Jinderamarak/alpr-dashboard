@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"github.com/jinderamarak/alpr-dasboard/internal/data"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
@@ -46,9 +47,27 @@ func (service *carService) GetById(carId uuid.UUID) (model.Car, error) {
 
 func (service *carService) GetOrCreateByPlate(plate string) (model.Car, error) {
 	plate = strings.ToUpper(plate)
+
+	err := validatePlate(plate)
+	if err != nil {
+		return model.Car{}, err
+	}
+
 	return service.cars.GetOrCreateByPlate(plate)
 }
 
 func (service *carService) Update(carId uuid.UUID, isAuthorized bool, description string) error {
 	return service.cars.Update(carId, isAuthorized, description)
+}
+
+var (
+	ErrPlateTooShort = errors.New("license plate too short, minimum length is 3")
+)
+
+func validatePlate(plate string) error {
+	if len(plate) < 3 {
+		return ErrPlateTooShort
+	}
+
+	return nil
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jinderamarak/alpr-dasboard/internal/service"
@@ -49,15 +50,20 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 
 func (controller *RecognitionController) PostRecognition(ctx *gin.Context) {
 	plate := ctx.PostForm("plate")
-	if len(plate) < 3 {
-		//ctx.String(http.StatusBadRequest, "Invalid license plate, minimum length is 3.")
+
+	_, err := controller.recognitions.CreateByPlate(plate)
+	if err != nil {
+		if errors.Is(err, service.ErrPlateTooShort) {
+			ctx.HTML(http.StatusOK, "recognition/creation", gin.H{
+				"error": "Plate is too short, minimum length is 3 characters.",
+			})
+			return
+		}
 		ctx.HTML(http.StatusOK, "recognition/creation", gin.H{
-			"error": "Invalid license plate, minimum length is 3.",
+			"error": "Unknown error",
 		})
 		return
 	}
-
-	_, _ = controller.recognitions.CreateByPlate(plate)
 
 	ctx.Header("HX-Trigger", "recognition-event-created")
 	ctx.HTML(http.StatusOK, "recognition/creation", gin.H{})

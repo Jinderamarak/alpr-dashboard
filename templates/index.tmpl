@@ -8,38 +8,20 @@
     <body>
 
     <h2>Create new recognition event:</h2>
-    <form method="post" action="/recognition">
+    <form hx-post="/recognition/" hx-target="#recognition-event-result" hx-on:htmx:after-request="this.reset()">
         <label>
             License Plate
             <input type="text" name="plate" placeholder="1A29876">
         </label>
         <button type="submit">Create</button>
     </form>
+    <div id="recognition-event-result">
+        <p>|</p>
+    </div>
 
     <h2>Recent recognitions:</h2>
-    <ul>
-        {{ range .recognitions }}
-            <li>
-                <p>
-                    Car:
-                    {{ if .Car }}
-                        <a href="/car/{{ .Car.ID }}">{{ .Car.Plate }}</a>
-                    {{ else }}
-                        <i>Not available</i>
-                    {{ end }}
-                    <a href="/recognition/{{ .ID }}">See details</a>
-                </p>
-                <p>Recognized at: {{ formatDT .CreatedAt }}</p>
-            </li>
-        {{ else }}
-            <li>No recent recognitions</li>
-        {{ end }}
-    </ul>
-
-    <div style="display: flex;flex-flow: row;justify-content: center;gap: 1rem">
-        {{ range $i := (seq .pages) }}
-            <a href="/?page={{ $i }}">{{ $i }}</a>
-        {{ end }}
+    <div hx-get="/recognition/?page=1" hx-trigger="load, recognition-event-created from:body" hx-target="#recognitions" id="recognitions">
+        Loading ...
     </div>
 
     </body>

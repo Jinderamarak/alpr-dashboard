@@ -1,0 +1,7 @@
+{{ define "recognition/creation" }}
+    {{ if .error }}
+        <p style="background: palevioletred">{{ .error }}</p>
+    {{ else }}
+        <p style="background: palegreen" onload="this.delete()">Event created!</p>
+    {{ end }}
+{{ end }}

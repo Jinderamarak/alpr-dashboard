@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jinderamarak/alpr-dasboard/internal/service"
 	"net/http"
+	"strconv"
 )
 
 type RecognitionController struct {
@@ -16,8 +17,22 @@ func NewRecognitionController(recognitions service.RecognitionService) Recogniti
 }
 
 func (controller *RecognitionController) Route(routes *gin.RouterGroup) {
+	routes.GET("/", controller.GetList)
 	routes.GET("/:id", controller.GetRecognition)
 	routes.POST("/", controller.PostRecognition)
+}
+
+func (controller *RecognitionController) GetList(ctx *gin.Context) {
+	pageQuery := ctx.DefaultQuery("page", "1")
+	page, _ := strconv.Atoi(pageQuery)
+
+	pages, _ := controller.recognitions.CountPages()
+	recognitions, _ := controller.recognitions.GetPage(page)
+
+	ctx.HTML(http.StatusOK, "recognition/list", gin.H{
+		"recognitions": recognitions,
+		"pages":        pages,
+	})
 }
 
 func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
@@ -35,10 +50,15 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 func (controller *RecognitionController) PostRecognition(ctx *gin.Context) {
 	plate := ctx.PostForm("plate")
 	if len(plate) < 3 {
-		ctx.String(http.StatusBadRequest, "Invalid license plate, minimum length is 3.")
+		//ctx.String(http.StatusBadRequest, "Invalid license plate, minimum length is 3.")
+		ctx.HTML(http.StatusOK, "recognition/creation", gin.H{
+			"error": "Invalid license plate, minimum length is 3.",
+		})
 		return
 	}
 
 	_, _ = controller.recognitions.CreateByPlate(plate)
-	ctx.Redirect(http.StatusSeeOther, "/")
+
+	ctx.Header("HX-Trigger", "recognition-event-created")
+	ctx.HTML(http.StatusOK, "recognition/creation", gin.H{})
 }

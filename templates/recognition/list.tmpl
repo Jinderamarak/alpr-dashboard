@@ -1,0 +1,26 @@
+{{ define "recognition/list" }}
+    <ul>
+        {{ range .recognitions }}
+            <li>
+                <p>
+                    Car:
+                    {{ if .Car }}
+                        <a href="/car/{{ .Car.ID }}">{{ .Car.Plate }}</a>
+                    {{ else }}
+                        <i>Not available</i>
+                    {{ end }}
+                    <a href="/recognition/{{ .ID }}">See details</a>
+                </p>
+                <p>Recognized at: {{ formatDT .CreatedAt }}</p>
+            </li>
+        {{ else }}
+            <li>No recent recognitions</li>
+        {{ end }}
+    </ul>
+
+    <div style="display: flex;flex-flow: row;justify-content: center;gap: 1rem">
+        {{ range $i := (seq .pages) }}
+            <button hx-get="/recognition/?page={{ $i }}" hx-target="#recognitions">{{ $i }}</button>
+        {{ end }}
+    </div>
+{{ end }}

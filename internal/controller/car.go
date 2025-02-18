@@ -22,7 +22,7 @@ func NewCarController(cars service.CarService, recognitions service.RecognitionS
 func (controller *CarController) Route(routes *gin.RouterGroup) {
 	routes.GET("/:id", controller.GetCar)
 	routes.GET("/:id/edit", controller.EditCar)
-	routes.POST("/:id", controller.UpdateCar)
+	routes.PATCH("/:id", controller.UpdateCar)
 	routes.GET("/:id/vignette", controller.GetVignette)
 }
 
@@ -67,7 +67,8 @@ func (controller *CarController) UpdateCar(ctx *gin.Context) {
 
 	_ = controller.cars.Update(carUuid, authorized, description)
 
-	ctx.Redirect(http.StatusSeeOther, "/car/"+carUuid.String())
+	ctx.Header("HX-Redirect", "/car/"+carUuid.String())
+	ctx.String(http.StatusOK, "ok")
 }
 
 func (controller *CarController) GetVignette(ctx *gin.Context) {

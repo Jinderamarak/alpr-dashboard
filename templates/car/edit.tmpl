@@ -11,7 +11,7 @@
 
     <h1>Car {{ .car.Plate }}</h1>
 
-    <form method="post" action="/car/{{ .car.ID }}">
+    <form hx-patch="/car/{{ .car.ID }}">
         <label>
             Is Authorized
             <input type="checkbox" name="authorized" {{ if .car.IsAuthorized }} checked {{ end }}>

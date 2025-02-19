@@ -23,33 +23,38 @@ func main() {
 	db.AutoMigrate(&model.Car{}, &model.Recognition{})
 
 	carRepo := data.NewCarRepository(db)
-	recRepo := data.NewRecognitionRepository(db)
-	vigData := data.NewEDalniceVignetteProvider()
+	recognitionRepo := data.NewRecognitionRepository(db)
+	vignetteProvider := data.NewEDalniceVignetteProvider()
 
 	carService := service.NewCarService(carRepo)
-	recognitionService := service.NewRecognitionService(recRepo, carService)
-	vignetteService := service.NewVignetteService(vigData)
+	recognitionService := service.NewRecognitionService(recognitionRepo, carService)
+	vignetteService := service.NewVignetteService(vignetteProvider)
+
+	funcMap := template.FuncMap{
+		"seq":      templates.Sequence,
+		"formatDT": templates.FormatDateTime,
+	}
+	notificationTemplates := loadTemplates(funcMap, "templates/notification/", "*.tmpl")
 
 	indexController := controller.NewIndexController(recognitionService)
 	carController := controller.NewCarController(carService, recognitionService, vignetteService)
 	recognitionController := controller.NewRecognitionController(recognitionService)
+	notificationController := controller.NewNotificationController(notificationTemplates, recognitionService, carService)
 
 	server := gin.Default()
-	server.SetHTMLTemplate(loadTemplates(template.FuncMap{
-		"seq":      templates.Sequence,
-		"formatDT": templates.FormatDateTime,
-	}))
+	server.SetHTMLTemplate(loadTemplates(funcMap, "templates/", "*.tmpl"))
 
 	indexController.Route(server.Group("/"))
 	carController.Route(server.Group("/car"))
 	recognitionController.Route(server.Group("/recognition"))
+	notificationController.Route(server.Group("/"))
 
 	server.Run("localhost:8080")
 }
 
-func loadTemplates(funcMap template.FuncMap) *template.Template {
+func loadTemplates(funcMap template.FuncMap, folder, fileEnding string) *template.Template {
 	files := make([]string, 0)
-	err := includeSubfolders(&files, "templates/", "*.tmpl")
+	err := includeSubfolders(&files, folder, fileEnding)
 	if err != nil {
 		errors.Unwrap(err)
 	}

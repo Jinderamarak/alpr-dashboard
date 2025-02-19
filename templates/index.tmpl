@@ -3,6 +3,7 @@
     <html lang="en">
     <head>
         {{ template "head" }}
+        <script src="https://unpkg.com/htmx-ext-ws@2.0.2"></script>
         <title>ALPR Dashboard</title>
     </head>
     <body>
@@ -17,6 +18,11 @@
     </form>
     <div id="recognition-event-result">
         <p>|</p>
+    </div>
+
+    <h2>Live event:</h2>
+    <div hx-ext="ws" ws-connect="/ws" id="recognition-notifications">
+        <i>None</i>
     </div>
 
     <h2>Recent recognitions:</h2>

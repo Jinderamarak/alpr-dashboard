@@ -1,0 +1,12 @@
+{{ define "notification/recognition" }}
+    <div id="recognition-notifications">
+        <p>
+            At {{ formatDT .event.CreatedAt }},
+            {{ if .event.Car }}
+                Car: <a href="/car/{{ .event.Car.ID }}">{{ .event.Car.Plate }}</a>
+            {{ else }}
+                <i>Unknown Car</i>
+            {{ end }}
+        </p>
+    </div>
+{{ end }}

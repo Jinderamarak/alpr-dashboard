@@ -16,15 +16,19 @@ type RecognitionService interface {
 	GetPageWithCarId(carId *uuid.UUID, page int) ([]model.Recognition, error)
 	CountPagesWithCarId(carId *uuid.UUID) (int, error)
 	GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error)
+	Notifications() *util.Broker[model.Recognition]
 }
 
 type recognitionService struct {
-	recognitions data.RecognitionRepository
-	carService   CarService
+	recognitions  data.RecognitionRepository
+	carService    CarService
+	notifications *util.Broker[model.Recognition]
 }
 
 func NewRecognitionService(recognitions data.RecognitionRepository, carService CarService) RecognitionService {
-	return &recognitionService{recognitions, carService}
+	notifications := util.NewBroker[model.Recognition]()
+	go notifications.Start()
+	return &recognitionService{recognitions, carService, notifications}
 }
 
 func (service *recognitionService) CreateByPlate(plate string) (model.Recognition, error) {
@@ -42,6 +46,7 @@ func (service *recognitionService) CreateByPlate(plate string) (model.Recognitio
 		return model.Recognition{}, err
 	}
 
+	service.notifications.Publish(created)
 	return created, nil
 }
 
@@ -75,4 +80,8 @@ func (service *recognitionService) CountPagesWithCarId(carId *uuid.UUID) (int, e
 
 func (service *recognitionService) GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error) {
 	return service.recognitions.GetByIdWithCar(recognitionId)
+}
+
+func (service *recognitionService) Notifications() *util.Broker[model.Recognition] {
+	return service.notifications
 }

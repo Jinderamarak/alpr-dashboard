@@ -11,6 +11,6 @@ Dashboard for Automatic License Plate Reader system
 ---
 
 - [x] Check paid vignette for car - edalnice.cz
-- [ ] Websocket notifications for new events
+- [x] Websocket notifications for new events
 - [ ] Upload image to recognition event
 - [ ] Authentication

@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	s3Client, err := minio.New("localhost:9000", &minio.Options{
+	s3, err := minio.New("localhost:9000", &minio.Options{
 		Creds: credentials.NewStaticV4("UqpPskfiWz8RWzMo7hcO", "gF9OKGEDDLEPASbDyrS6SpmDsxovuoFBPvC3RxVp", ""),
 	})
 
@@ -31,6 +31,7 @@ func main() {
 	carRepo := data.NewCarRepository(db)
 	recognitionRepo := data.NewRecognitionRepository(db)
 	vignetteProvider := data.NewEDalniceVignetteProvider()
+	photoRepo := data.NewPhotoRepository(db, s3)
 
 	carService := service.NewCarService(carRepo)
 	recognitionService := service.NewRecognitionService(recognitionRepo, carService)

@@ -8,6 +8,8 @@ import (
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
 	"github.com/jinderamarak/alpr-dasboard/internal/service"
 	"github.com/jinderamarak/alpr-dasboard/templates"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"html/template"
@@ -15,6 +17,10 @@ import (
 )
 
 func main() {
+	s3Client, err := minio.New("localhost:9000", &minio.Options{
+		Creds: credentials.NewStaticV4("UqpPskfiWz8RWzMo7hcO", "gF9OKGEDDLEPASbDyrS6SpmDsxovuoFBPvC3RxVp", ""),
+	})
+
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		errors.Unwrap(err)

@@ -28,18 +28,18 @@ type PhotoRepository interface {
 }
 
 type photoRepository struct {
-	db *gorm.DB
-	s3 *minio.Client
+	db      *gorm.DB
+	objects *minio.Client
 }
 
-func NewPhotoRepository(db *gorm.DB, s3 *minio.Client) PhotoRepository {
+func NewPhotoRepository(db *gorm.DB, objects *minio.Client) PhotoRepository {
 	if db == nil {
 		panic("expected db, but got nil")
 	}
-	if s3 == nil {
-		panic("expected s3, but got nil")
+	if objects == nil {
+		panic("expected objects, but got nil")
 	}
-	return &photoRepository{db, s3}
+	return &photoRepository{db, objects}
 }
 
 func (repo *photoRepository) CreateUploadByRecognitionId(recognitionId uuid.UUID) (*url.URL, map[string]string, error) {
@@ -57,7 +57,7 @@ func (repo *photoRepository) CreateUploadByRecognitionId(recognitionId uuid.UUID
 	errors.Unwrap(policy.SetExpires(time.Now().UTC().Add(createPresignedExpiration)))
 	errors.Unwrap(policy.SetContentType("image/jpeg"))
 
-	return repo.s3.PresignedPostPolicy(context.Background(), policy)
+	return repo.objects.PresignedPostPolicy(context.Background(), policy)
 }
 
 func (repo *photoRepository) ListByRecognitionId(recognitionId *uuid.UUID) ([]*url.URL, error) {
@@ -74,7 +74,7 @@ func (repo *photoRepository) ListByRecognitionId(recognitionId *uuid.UUID) ([]*u
 	urls := make([]*url.URL, len(photos))
 	reqParams := make(url.Values)
 	for i, p := range photos {
-		presigned, err := repo.s3.PresignedGetObject(context.Background(), bucket, keyPrefix+p.ID, getPresignedExpiration, reqParams)
+		presigned, err := repo.objects.PresignedGetObject(context.Background(), bucket, keyPrefix+p.ID, getPresignedExpiration, reqParams)
 		if err != nil {
 			return nil, err
 		}

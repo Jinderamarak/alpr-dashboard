@@ -11,11 +11,10 @@ import (
 
 type RecognitionController struct {
 	recognitions service.RecognitionService
-	photos       service.PhotoService
 }
 
-func NewRecognitionController(recognitions service.RecognitionService, photos service.PhotoService) RecognitionController {
-	return RecognitionController{recognitions, photos}
+func NewRecognitionController(recognitions service.RecognitionService) RecognitionController {
+	return RecognitionController{recognitions}
 }
 
 func (controller *RecognitionController) Route(routes *gin.RouterGroup) {
@@ -43,7 +42,7 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 	recognitionUuid, _ := uuid.Parse(recognitionId)
 
 	recognition, _ := controller.recognitions.GetByIdWithCar(recognitionUuid)
-	photos, _ := controller.photos.ListByRecognitionId(&recognitionUuid)
+	photos, _ := controller.recognitions.ImagesByRecognitionId(&recognitionUuid)
 
 	ctx.HTML(http.StatusOK, "recognition/event", gin.H{
 		"id":         recognition.ID,
@@ -58,7 +57,7 @@ func (controller *RecognitionController) GetUploadForm(ctx *gin.Context) {
 	recognitionUuid, _ := uuid.Parse(recognitionId)
 
 	_, _ = controller.recognitions.GetByIdWithCar(recognitionUuid)
-	presigned, form, _ := controller.photos.CreateUploadByRecognitionId(recognitionUuid)
+	presigned, form, _ := controller.recognitions.CreateImageUpload(recognitionUuid)
 
 	ctx.HTML(http.StatusOK, "recognition/upload", gin.H{
 		"url":  presigned,

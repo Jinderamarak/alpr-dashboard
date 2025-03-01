@@ -5,6 +5,7 @@ import (
 	"github.com/jinderamarak/alpr-dasboard/internal/data"
 	"github.com/jinderamarak/alpr-dasboard/internal/model"
 	"github.com/jinderamarak/alpr-dasboard/internal/util"
+	"net/url"
 )
 
 const RecognitionPageSize = 10
@@ -17,18 +18,21 @@ type RecognitionService interface {
 	CountPagesWithCarId(carId *uuid.UUID) (int, error)
 	GetByIdWithCar(recognitionId uuid.UUID) (model.Recognition, error)
 	Notifications() *util.Broker[model.Recognition]
+	CreateImageUpload(recognitionId uuid.UUID) (*url.URL, map[string]string, error)
+	ImagesByRecognitionId(recognitionId *uuid.UUID) ([]*url.URL, error)
 }
 
 type recognitionService struct {
 	recognitions  data.RecognitionRepository
+	images        data.RecognitionImageRepository
 	carService    CarService
 	notifications *util.Broker[model.Recognition]
 }
 
-func NewRecognitionService(recognitions data.RecognitionRepository, carService CarService) RecognitionService {
+func NewRecognitionService(recognitions data.RecognitionRepository, images data.RecognitionImageRepository, carService CarService) RecognitionService {
 	notifications := util.NewBroker[model.Recognition]()
 	go notifications.Start()
-	return &recognitionService{recognitions, carService, notifications}
+	return &recognitionService{recognitions, images, carService, notifications}
 }
 
 func (service *recognitionService) CreateByPlate(plate string) (model.Recognition, error) {
@@ -84,4 +88,12 @@ func (service *recognitionService) GetByIdWithCar(recognitionId uuid.UUID) (mode
 
 func (service *recognitionService) Notifications() *util.Broker[model.Recognition] {
 	return service.notifications
+}
+
+func (service *recognitionService) CreateImageUpload(recognitionId uuid.UUID) (*url.URL, map[string]string, error) {
+	return service.images.CreateUploadByRecognitionId(recognitionId)
+}
+
+func (service *recognitionService) ImagesByRecognitionId(recognitionId *uuid.UUID) ([]*url.URL, error) {
+	return service.images.ListByRecognitionId(recognitionId)
 }

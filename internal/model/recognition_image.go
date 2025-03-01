@@ -5,13 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Photo struct {
+type RecognitionImage struct {
 	ID            string
 	RecognitionID *string
 	Recognition   *Recognition `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
-func (photo *Photo) BeforeCreate(tx *gorm.DB) (err error) {
+func (photo *RecognitionImage) BeforeCreate(tx *gorm.DB) (err error) {
 	photo.ID = uuid.NewString()
 	return nil
 }

@@ -26,17 +26,16 @@ func main() {
 		errors.Unwrap(err)
 	}
 
-	errors.Unwrap(db.AutoMigrate(&model.Car{}, &model.Recognition{}, &model.Photo{}))
+	errors.Unwrap(db.AutoMigrate(&model.Car{}, &model.Recognition{}, &model.RecognitionImage{}))
 
 	carRepo := data.NewCarRepository(db)
 	recognitionRepo := data.NewRecognitionRepository(db)
 	vignetteProvider := data.NewEDalniceVignetteProvider()
-	photoRepo := data.NewPhotoRepository(db, objects)
+	imageRepo := data.NewRecognitionImageRepository(db, objects)
 
 	carService := service.NewCarService(carRepo)
-	recognitionService := service.NewRecognitionService(recognitionRepo, carService)
+	recognitionService := service.NewRecognitionService(recognitionRepo, imageRepo, carService)
 	vignetteService := service.NewVignetteService(vignetteProvider)
-	photoService := service.NewPhotoService(photoRepo)
 
 	funcMap := template.FuncMap{
 		"seq":      templates.Sequence,
@@ -46,7 +45,7 @@ func main() {
 
 	indexController := controller.NewIndexController(recognitionService)
 	carController := controller.NewCarController(carService, recognitionService, vignetteService)
-	recognitionController := controller.NewRecognitionController(recognitionService, photoService)
+	recognitionController := controller.NewRecognitionController(recognitionService)
 	notificationController := controller.NewNotificationController(notificationTemplates, recognitionService, carService)
 
 	server := gin.Default()

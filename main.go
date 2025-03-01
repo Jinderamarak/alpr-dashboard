@@ -26,7 +26,7 @@ func main() {
 		errors.Unwrap(err)
 	}
 
-	db.AutoMigrate(&model.Car{}, &model.Recognition{}, &model.Photo{})
+	errors.Unwrap(db.AutoMigrate(&model.Car{}, &model.Recognition{}, &model.Photo{}))
 
 	carRepo := data.NewCarRepository(db)
 	recognitionRepo := data.NewRecognitionRepository(db)
@@ -57,7 +57,7 @@ func main() {
 	recognitionController.Route(server.Group("/recognition"))
 	notificationController.Route(server.Group("/"))
 
-	server.Run("localhost:8080")
+	errors.Unwrap(server.Run("localhost:8080"))
 }
 
 func loadTemplates(funcMap template.FuncMap, folder, fileEnding string) *template.Template {

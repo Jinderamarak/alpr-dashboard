@@ -24,7 +24,7 @@ var (
 
 type PhotoRepository interface {
 	CreateUploadByRecognitionId(recognitionId uuid.UUID) (*url.URL, map[string]string, error)
-	GetByRecognitionId(recognitionId *uuid.UUID) ([]url.URL, error)
+	ListByRecognitionId(recognitionId *uuid.UUID) ([]*url.URL, error)
 }
 
 type photoRepository struct {
@@ -60,7 +60,7 @@ func (repo *photoRepository) CreateUploadByRecognitionId(recognitionId uuid.UUID
 	return repo.s3.PresignedPostPolicy(context.Background(), policy)
 }
 
-func (repo *photoRepository) GetByRecognitionId(recognitionId *uuid.UUID) ([]url.URL, error) {
+func (repo *photoRepository) ListByRecognitionId(recognitionId *uuid.UUID) ([]*url.URL, error) {
 	id := util.MapPtr(recognitionId, func(uuid uuid.UUID) string {
 		return uuid.String()
 	})
@@ -71,14 +71,14 @@ func (repo *photoRepository) GetByRecognitionId(recognitionId *uuid.UUID) ([]url
 		return nil, result.Error
 	}
 
-	urls := make([]url.URL, len(photos))
+	urls := make([]*url.URL, len(photos))
 	reqParams := make(url.Values)
 	for i, p := range photos {
 		presigned, err := repo.s3.PresignedGetObject(context.Background(), bucket, keyPrefix+p.ID, getPresignedExpiration, reqParams)
 		if err != nil {
 			return nil, err
 		}
-		urls[i] = *presigned
+		urls[i] = presigned
 	}
 
 	return urls, nil

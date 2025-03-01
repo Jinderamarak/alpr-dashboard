@@ -1,0 +1,10 @@
+{{ define "recognition/upload" }}
+    <h2>Upload new photo:</h2>
+    <form action="{{ .url }}" method="post" enctype="multipart/form-data">
+        {{ range $key, $value := .form }}
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        {{ end }}
+        <input type="file" name="file" accept="image/jpeg">
+        <input type="submit" value="Upload">
+    </form>
+{{ end }}

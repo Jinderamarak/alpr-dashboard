@@ -11,15 +11,17 @@ import (
 
 type RecognitionController struct {
 	recognitions service.RecognitionService
+	photos       service.PhotoService
 }
 
-func NewRecognitionController(recognitions service.RecognitionService) RecognitionController {
-	return RecognitionController{recognitions}
+func NewRecognitionController(recognitions service.RecognitionService, photos service.PhotoService) RecognitionController {
+	return RecognitionController{recognitions, photos}
 }
 
 func (controller *RecognitionController) Route(routes *gin.RouterGroup) {
 	routes.GET("/", controller.GetList)
 	routes.GET("/:id", controller.GetRecognition)
+	routes.GET("/:id/upload", controller.GetUploadForm)
 	routes.POST("/", controller.PostRecognition)
 }
 
@@ -41,10 +43,26 @@ func (controller *RecognitionController) GetRecognition(ctx *gin.Context) {
 	recognitionUuid, _ := uuid.Parse(recognitionId)
 
 	recognition, _ := controller.recognitions.GetByIdWithCar(recognitionUuid)
+	photos, _ := controller.photos.ListByRecognitionId(&recognitionUuid)
 
 	ctx.HTML(http.StatusOK, "recognition/event", gin.H{
+		"id":         recognition.ID,
 		"recognized": recognition.CreatedAt,
 		"car":        recognition.Car,
+		"photos":     photos,
+	})
+}
+
+func (controller *RecognitionController) GetUploadForm(ctx *gin.Context) {
+	recognitionId := ctx.Param("id")
+	recognitionUuid, _ := uuid.Parse(recognitionId)
+
+	_, _ = controller.recognitions.GetByIdWithCar(recognitionUuid)
+	presigned, form, _ := controller.photos.CreateUploadByRecognitionId(recognitionUuid)
+
+	ctx.HTML(http.StatusOK, "recognition/upload", gin.H{
+		"url":  presigned,
+		"form": form,
 	})
 }
 
